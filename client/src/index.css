@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Chat App Dark Theme Design System */
+
+@layer base {
+  :root {
+    /* Dark Theme Colors */
+    --bg-primary: 240 10% 3.9%;
+    --bg-secondary: 240 3.7% 15.9%;
+    --bg-tertiary: 240 5.9% 10%;
+    
+    /* Chat Bubble Colors */
+    --chat-sent: 142 76% 36%;
+    --chat-received: 217 33% 17%;
+    --chat-sent-hover: 142 76% 40%;
+    --chat-received-hover: 217 33% 20%;
+    
+    /* Text Colors */
+    --text-primary: 0 0% 98%;
+    --text-secondary: 240 5% 84%;
+    --text-muted: 240 3.8% 46.1%;
+    --text-accent: 142 76% 36%;
+    
+    /* Accent Colors */
+    --accent-primary: 142 76% 36%;
+    --accent-secondary: 217 91% 60%;
+    --accent-danger: 0 84% 60%;
+    
+    /* Border & Input */
+    --border-primary: 240 3.7% 15.9%;
+    --border-secondary: 240 5.9% 10%;
+    --input-bg: 240 5.9% 10%;
+    --input-border: 240 3.7% 15.9%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 40%));
+    --gradient-secondary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 65%));
+    --gradient-dark: linear-gradient(135deg, hsl(240 10% 3.9%), hsl(240 5.9% 10%));
+    
+    /* Shadows */
+    --shadow-chat: 0 4px 12px -4px hsl(240 10% 3.9% / 0.3);
+    --shadow-glow: 0 0 20px hsl(142 76% 36% / 0.2);
+    --shadow-card: 0 8px 32px -8px hsl(240 10% 3.9% / 0.5);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border-primary;
+  }
+  
+  body {
+    @apply bg-bg-primary text-text-primary;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Chat Bubble Components */
+  .chat-bubble-sent {
+    @apply bg-chat-sent text-white rounded-2xl rounded-br-md px-4 py-3 ml-auto max-w-xs shadow-chat text-left;
+    @apply hover:bg-chat-sent-hover transition-colors duration-200;
+  }
+  
+  .chat-bubble-received {
+    @apply bg-chat-received text-text-primary rounded-2xl rounded-bl-md px-4 py-3 mr-auto max-w-xs shadow-chat text-left;
+    @apply hover:bg-chat-received-hover transition-colors duration-200;
+  }
+  
+  /* Form Field as Chat Bubble */
+  .chat-input-sent {
+    @apply bg-chat-sent text-white rounded-2xl rounded-br-md px-4 py-3 ml-auto w-full max-w-xs;
+    @apply focus:outline-none focus:ring-2 focus:ring-accent-primary/50 transition-all duration-200;
+    @apply placeholder:text-white/70;
+  }
+  
+  .chat-input-received {
+    @apply bg-chat-received text-text-primary rounded-2xl rounded-bl-md px-4 py-3 mr-auto w-full max-w-xs;
+    @apply focus:outline-none focus:ring-2 focus:ring-accent-secondary/50 transition-all duration-200;
+    @apply placeholder:text-text-secondary;
+  }
+  
+  /* Primary Button */
+  .btn-primary {
+    @apply bg-gradient-to-r from-accent-primary to-chat-sent-hover;
+    @apply text-white font-semibold px-6 py-3 rounded-xl;
+    @apply hover:shadow-glow transform hover:scale-105 transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-accent-primary/50;
+  }
+  
+  /* Secondary Button */
+  .btn-secondary {
+    @apply bg-bg-secondary border border-border-primary text-text-primary;
+    @apply font-semibold px-6 py-3 rounded-xl;
+    @apply hover:bg-bg-tertiary hover:border-accent-primary/50 transform hover:scale-105;
+    @apply transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent-secondary/50;
+  }
+  
+  /* Chat Send Button */
+  .btn-send {
+    @apply bg-accent-primary hover:bg-chat-sent-hover text-white;
+    @apply p-3 rounded-full shadow-chat hover:shadow-glow;
+    @apply transform hover:scale-110 transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-accent-primary/50;
+  }
+  
+  /* Card Components */
+  .card-primary {
+    @apply bg-bg-secondary border border-border-primary rounded-2xl p-6 shadow-card;
+    @apply hover:border-accent-primary/30 transition-all duration-300;
+  }
+  
+  /* Navigation */
+  .nav-link {
+    @apply text-text-secondary hover:text-text-primary transition-colors duration-200;
+    @apply relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5;
+    @apply after:bg-accent-primary after:transition-all after:duration-300;
+    @apply hover:after:w-full;
+  }
+  
+  /* Animations */
+  .animate-slide-up {
+    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+  
+  .animate-chat-appear {
+    animation: chatAppear 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes chatAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
