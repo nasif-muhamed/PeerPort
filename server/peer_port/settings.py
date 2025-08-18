@@ -17,7 +17,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "http://localhost:8000/").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 
 # Application definition
@@ -32,10 +32,10 @@ INSTALLED_APPS = [
 
     # installed apps
     'corsheaders',
-    'rest_framework'
+    'rest_framework',
 
     # my apps
-
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -125,6 +125,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# Abstract User
+AUTH_USER_MODEL = "users.User"
 
 # REST Setup
 REST_FRAMEWORK = {
