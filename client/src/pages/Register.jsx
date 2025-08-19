@@ -3,12 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { IoIosSend  } from "react-icons/io";
 import { toast } from 'sonner'
 import { registerUser } from "../services/api/api_service"
+import { handleError } from "../utils/handleError";
 import ChatInput from "../components/ChatInput";
 import ChatButton from "../components/ChatButton";
 import ChatBubble from "../components/ChatBubble";
 import validateFormData from "../utils/validateFormData"
+import ChatLoader from "../components/ui/ChatLoader";
 
 const Register = () => {
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -26,24 +29,26 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const {isValid, errorMessage} = validateFormData(formData)
+    const {isValid, errorMessage} = validateFormData(formData);
     if (!isValid) {
-      toast.error(errorMessage)
-      return
-    }
-    console.log('formdata:', formData)
+      toast.error(errorMessage);
+      return;
+    };
     try{
-      const response = await registerUser(formData)
-      console.log('response:', response)
+      setLoading(true);
+      const response = await registerUser(formData);
+      toast.success(response?.data?.message || 'User registered successfully');
+      navigate('/login');
     }catch (error){
-      console.log('error:', error)
+      handleError(error);
     }finally{
-
-    }
+      setLoading(false);
+    };
   };
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-4 py-8">
+      {loading && <ChatLoader message="Kindly wait for a moment"/>}
       <div className="max-w-md w-full">        
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">Join PeerPort</h1>

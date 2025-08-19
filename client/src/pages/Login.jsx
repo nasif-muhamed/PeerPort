@@ -6,8 +6,12 @@ import { loginUser } from "../services/api/api_service"
 import ChatInput from "../components/ChatInput";
 import ChatButton from "../components/ChatButton";
 import ChatBubble from "../components/ChatBubble";
+import ChatLoader from "../components/ui/ChatLoader";
+import { handleError } from "../utils/handleError";
+import { setAccessToken, setRefreshToken } from "../utils/tokenManager";
 
 const Login = () => {
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     username: "",
     password: ""
@@ -21,7 +25,7 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.username.trim()){
       toast.error('Username is required')
@@ -30,16 +34,21 @@ const Login = () => {
       toast.error('Password is required')
     }
     try{
-
-    }catch{
-
+      setLoading(true)
+      const response = await loginUser(formData)
+      setAccessToken(response?.data?.access)
+      setRefreshToken(response?.data?.refresh)
+      navigate('/dashboard')
+    }catch (error) {
+      handleError(error)
     }finally{
-      
+      setLoading(false)
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-4 py-8">
+      {loading && <ChatLoader message="Kindly wait for a moment"/>}
       <div className="max-w-md w-full">        
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>

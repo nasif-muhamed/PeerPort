@@ -10,9 +10,10 @@ const Landing = () => {
       <div className="max-w-4xl w-full mx-auto text-center">
         {/* Hero Section */}
         <div className="mb-12 animate-fade-in">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">
-            PeerPort
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-primary bg-clip-text">
+            Peer<span className="text-accent-primary">Port</span>
           </h1>
+
           <p className="text-xl md:text-2xl text-text-secondary mb-8 max-w-2xl mx-auto">
             Connect instantly, chat temporarily. Create rooms, invite friends, and enjoy conversations that disappear when you're done.
           </p>

@@ -13,12 +13,12 @@ const NotFound = () => {
               Hmm... I can't find that page 🤔
             </ChatBubble>
           </div>
-          <div className="flex justify-end animate-chat-appear" style={{animationDelay: '0.3s'}}>
+          <div className="flex justify-end animate-chat-appear">
             <ChatBubble variant="sent">
               Error 404: Page not found
             </ChatBubble>
           </div>
-          <div className="flex justify-start animate-chat-appear" style={{animationDelay: '0.6s'}}>
+          <div className="flex justify-start animate-chat-appear">
             <ChatBubble variant="received">
               Let's get you back to somewhere useful! 🚀
             </ChatBubble>
@@ -32,12 +32,12 @@ const NotFound = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link>
+            <Link to={'/'}>
               <ChatButton variant="primary">
                 Go Home
               </ChatButton>
             </Link>
-            <Link>
+            <Link to={'/dashboard'}>
               <ChatButton variant="secondary">
                 Dashboard
               </ChatButton>
