@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoIosSend  } from "react-icons/io";
 import { toast } from 'sonner'
+import { registerUser } from "../services/api/api_service"
 import ChatInput from "../components/ChatInput";
 import ChatButton from "../components/ChatButton";
 import ChatBubble from "../components/ChatBubble";
@@ -23,17 +24,19 @@ const Register = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const {isValid, errorMessage} = validateFormData(formData)
     if (!isValid) {
       toast.error(errorMessage)
       return
     }
+    console.log('formdata:', formData)
     try{
-
-    }catch{
-
+      const response = await registerUser(formData)
+      console.log('response:', response)
+    }catch (error){
+      console.log('error:', error)
     }finally{
 
     }

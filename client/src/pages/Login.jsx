@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoIosSend  } from "react-icons/io";
 import { toast } from "sonner";
+import { loginUser } from "../services/api/api_service"
 import ChatInput from "../components/ChatInput";
 import ChatButton from "../components/ChatButton";
 import ChatBubble from "../components/ChatBubble";
