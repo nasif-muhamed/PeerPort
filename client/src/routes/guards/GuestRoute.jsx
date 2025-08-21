@@ -1,9 +1,10 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { getAccessToken } from "../../utils/tokenManager";
+
+import { useAuthTokens } from "../../hooks/useAuthTokens";
 
 const GuestRoute = () => {
-  const token = getAccessToken()
-  return token ? <Navigate to={'/dashboard'}/> : <Outlet/>
+  const { accessToken } = useAuthTokens()
+  return accessToken ? <Navigate to={'/dashboard'}/> : <Outlet/>
 }
 
 export default GuestRoute

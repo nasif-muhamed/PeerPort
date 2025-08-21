@@ -2,21 +2,23 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoIosSend  } from "react-icons/io";
 import { toast } from "sonner";
-import { loginUser } from "../services/api/api_service"
+
 import ChatInput from "../components/ChatInput";
 import ChatButton from "../components/ChatButton";
 import ChatBubble from "../components/ChatBubble";
 import ChatLoader from "../components/ui/ChatLoader";
+import { loginUser } from "../services/api/api_service"
 import { handleError } from "../utils/handleError";
-import { setAccessToken, setRefreshToken } from "../utils/tokenManager";
+import { useAuthTokens } from "../hooks/useAuthTokens";
 
 const Login = () => {
   const [loading, setLoading] = useState(false)
+  const { setTokens } = useAuthTokens()
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     password: ""
   });
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -36,8 +38,7 @@ const Login = () => {
     try{
       setLoading(true)
       const response = await loginUser(formData)
-      setAccessToken(response?.data?.access)
-      setRefreshToken(response?.data?.refresh)
+      setTokens(response?.data?.access, response?.data?.refresh);
       navigate('/dashboard')
     }catch (error) {
       handleError(error)

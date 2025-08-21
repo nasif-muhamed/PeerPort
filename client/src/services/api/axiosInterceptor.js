@@ -1,10 +1,11 @@
 import api from "./axiosInstance";
-import {getAccessToken, getRefreshToken} from '../../utils/tokenManager'
+import { store } from "../../global-state/app/store"; 
+import { updateAcess, loguout } from "../../global-state/features/authSlice";
 
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    const accessToken = getAccessToken();
+    const { accessToken } = store.getState().auth;
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -31,7 +32,7 @@ api.interceptors.response.use(
       console.log('Error Code:', errorCode);
       
       if (errorCode === 'token_not_valid') {
-        const refreshToken = getRefreshToken();
+        const { refreshToken } = store.getState().auth;
         console.log('Using refresh token:', refreshToken);
 
         if (refreshToken) {
@@ -44,7 +45,7 @@ api.interceptors.response.use(
             console.log('New access token:', response.data.access);
             
             // Update the access token
-            setAccessToken(response.data.access);
+            store.dispatch(updateAcess({ access: response.data.access }));
 
             // Retry the original request with the new token
             originalRequest.headers.Authorization = `Bearer ${response.data.access}`;
@@ -52,6 +53,7 @@ api.interceptors.response.use(
           } catch (refreshError) {
             // Handle error if token refresh fails
             console.error('Token refresh failed:', refreshError);
+            store.dispatch(loguout()); // clear tokens on failure
             return Promise.reject(refreshError);
           }
         }

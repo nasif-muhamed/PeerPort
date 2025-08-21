@@ -2,20 +2,31 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoLogOutOutline, IoPersonCircleOutline, IoMenuOutline, IoCloseOutline } from 'react-icons/io5';
 import { toast } from 'sonner';
-import { clearTokens } from '../../utils/tokenManager';
+
+import { useAuthTokens } from '../../hooks/useAuthTokens';
+import { persistor } from '../../global-state/app/store';
+import { logoutUser } from '../../services/api/api_service';
+import { handleError } from '../../utils/handleError'
 
 const ChatNavbar = ({
   username = "User",
   className = ""
 }) => {
   const navigate = useNavigate();
+  const { refreshToken, clearTokens } = useAuthTokens();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    setIsMobileMenuOpen(false);
-    clearTokens();
-    toast.info('See you soon');
-    navigate('/', { replace: true });
+  const handleLogout = async () => {
+    try{
+      await logoutUser({refresh: refreshToken});
+      setIsMobileMenuOpen(false);
+      clearTokens();
+      persistor.purge();
+      toast.info('See you soon');
+      navigate('/', { replace: true });
+    }catch(error){
+      handleError(error)
+    }
   };
 
   return (
