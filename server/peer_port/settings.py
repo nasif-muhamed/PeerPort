@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     # installed apps
     'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
 
     # my apps
     'users'

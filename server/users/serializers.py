@@ -3,7 +3,9 @@ from django.contrib.auth import get_user_model
 from .validators import validate_username, validate_email, validate_password
 from .services import create_user
 
+
 User = get_user_model()
+
 
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(validators=[validate_username])

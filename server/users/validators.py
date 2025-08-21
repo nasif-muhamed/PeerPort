@@ -2,6 +2,7 @@ import re
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 
+
 User = get_user_model()
 USERNAME_PATTERN = r'^[a-z_]+$'
 PASSWORD_SPECIAL_CHARS = r'[!@#$%^&*(),.?":{}|<>]'
@@ -9,6 +10,7 @@ UPPER_CASE = r'[A-Z]'
 LOWER_CASE = r'[a-z]'
 DIGITS = r'[0-9]'
 SPACE = r'\s'
+
 
 def validate_username(value):
     if len(value) < 4:
@@ -23,10 +25,12 @@ def validate_username(value):
         raise ValidationError("This username is already taken.")
     return value
 
+
 def validate_email(value):
     if User.objects.filter(email__iexact=value).exists():
         raise ValidationError("This email is already registered.")
     return value
+
 
 def validate_password(value):
     if len(value) < 8:
