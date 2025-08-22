@@ -8,7 +8,7 @@ from rest_framework.generics import RetrieveAPIView, ListCreateAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Room, Message
 from .serializers import RoomOwnerSerializer
-
+from peer_port.pagination import CommonPagination
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 class OwnerRoomListCreateAPIView(ListCreateAPIView):
     serializer_class = RoomOwnerSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = CommonPagination
 
     def get_queryset(self):
         return (
