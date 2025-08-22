@@ -7,6 +7,7 @@ import ChatInput from "../components/ChatInput";
 import ChatButton from "../components/ChatButton";
 import ChatBubble from "../components/ChatBubble";
 import ChatLoader from "../components/ui/ChatLoader";
+import validateLoginFormData from "../utils/validations/validateLoginFormData"
 import { loginUser } from "../services/api/api_service"
 import { handleError } from "../utils/handleError";
 import { useAuthTokens } from "../hooks/useAuthTokens";
@@ -29,12 +30,13 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.username.trim()){
-      toast.error('Username is required')
-    }
-    if (!formData.password.trim()){
-      toast.error('Password is required')
-    }
+
+    const {isValid, errorMessage} = validateLoginFormData(formData);
+    if (!isValid) {
+      toast.error(errorMessage);
+      return;
+    };
+
     try{
       setLoading(true)
       const response = await loginUser(formData)

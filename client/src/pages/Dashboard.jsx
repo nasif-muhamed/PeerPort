@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import CreateRoomModal from "../components/CreateRoomModal";
 
 const Dashboard = () => {
+  const [showCreateModal, setShowCreateModal] = useState(false);
   return (
     <div className="min-h-screen px-4 py-8">
       <div className="max-w-4xl mx-auto">
@@ -42,7 +45,7 @@ const Dashboard = () => {
           </div>
 
           {/* Create Room */}
-          <div className="flex justify-start animate-chat-appear">
+          <div onClick={() => setShowCreateModal(true)} className="flex justify-start animate-chat-appear">
             <div className="bg-chat-received text-text-primary rounded-2xl rounded-bl-md px-6 py-4 mr-auto max-w-md cursor-pointer hover:bg-chat-received-hover transition-colors">
               <div className="flex items-center gap-3">
                 <div className="text-2xl">➕</div>
@@ -71,6 +74,10 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {showCreateModal && (
+        <CreateRoomModal onClose={() => setShowCreateModal(false)} />
+      )}
     </div>
   );
 };

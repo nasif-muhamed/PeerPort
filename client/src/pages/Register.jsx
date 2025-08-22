@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoIosSend  } from "react-icons/io";
 import { toast } from 'sonner'
-import { registerUser } from "../services/api/api_service"
-import { handleError } from "../utils/handleError";
+
 import ChatInput from "../components/ChatInput";
 import ChatButton from "../components/ChatButton";
 import ChatBubble from "../components/ChatBubble";
-import validateFormData from "../utils/validateFormData"
+import validateRegisterFormData from "../utils/validations/validateRegisterFormData"
 import ChatLoader from "../components/ui/ChatLoader";
+import { registerUser } from "../services/api/api_service"
+import { handleError } from "../utils/handleError";
 
 const Register = () => {
   const [loading, setLoading] = useState(false)
@@ -29,11 +30,13 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const {isValid, errorMessage} = validateFormData(formData);
+
+    const {isValid, errorMessage} = validateRegisterFormData(formData);
     if (!isValid) {
       toast.error(errorMessage);
       return;
     };
+
     try{
       setLoading(true);
       const response = await registerUser(formData);

@@ -1,4 +1,4 @@
-const validateFormData = (formData) => {
+const validateRegisterFormData = (formData) => {
   const username = formData.username.trim();
   const email = formData.email.trim();
   const password = formData.password.trim();
@@ -26,4 +26,4 @@ const validateFormData = (formData) => {
   return { isValid: true, errorMessage: null };
 };
 
-export default validateFormData;
+export default validateRegisterFormData;
