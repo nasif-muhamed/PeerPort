@@ -34,9 +34,11 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'channels',
 
     # my apps
-    'users'
+    'users',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +70,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'peer_port.wsgi.application'
+ASGI_APPLICATION = "peer_port.asgi.application"
 
 
 # Database
@@ -210,3 +213,10 @@ LOGGING = {
     }
 }
 
+
+# Channel setup - using defualt django cache backend instead of redis.
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
