@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Room, Message
 from .validators import validate_name, validate_access, validate_status, validate_limit
+from users.serializers import MiniUserSerializer
+
 
 class RoomOwnerSerializer(serializers.ModelSerializer):
     participant_count = serializers.SerializerMethodField()
@@ -13,6 +15,19 @@ class RoomOwnerSerializer(serializers.ModelSerializer):
         model = Room
         fields = ['id', 'name', 'access', 'status', 'limit', 'participant_count', 'last_message', 'created_at', 'updated_at']
         read_only_fields = ['id', 'participant_count', 'last_message', 'created_at', 'updated_at']
+
+    def get_participant_count(self, obj):
+        return getattr(obj, "participant_count", obj.participants.count())
+
+
+class PublicRoomSerializer(serializers.ModelSerializer):
+    participant_count = serializers.SerializerMethodField()
+    owner = MiniUserSerializer(read_only=True)
+
+    class Meta:
+        model = Room
+        fields = ['id', 'name', 'owner', 'access', 'limit', 'participant_count', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'participant_count', 'created_at', 'updated_at']
 
     def get_participant_count(self, obj):
         return getattr(obj, "participant_count", obj.participants.count())
