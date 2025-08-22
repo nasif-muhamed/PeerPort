@@ -1,6 +1,7 @@
 import api from "./axiosInstance";
 import { store } from "../../global-state/app/store"; 
 import { updateAcess, loguout } from "../../global-state/features/authSlice";
+import { getRefreshToken } from "./api_service";
 
 // Request interceptor
 api.interceptors.request.use(
@@ -38,9 +39,7 @@ api.interceptors.response.use(
         if (refreshToken) {
           try {
             // Attempt to refresh the token
-            const response = await api.post(`${BASE_URL}users/token/refresh/`, {
-              refresh: refreshToken
-            });
+            const response = await getRefreshToken({refresh: refreshToken})
             console.log('Current access token:', getAccessToken());
             console.log('New access token:', response.data.access);
             

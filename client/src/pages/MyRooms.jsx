@@ -1,0 +1,124 @@
+import { useState, useEffect, useCallback, useRef } from "react";
+
+import BackButton from "../components/BackButton";
+import ChatButton from "../components/ChatButton";
+import { getMyRooms } from "../services/api/api_service";
+import { handleError } from "../utils/handleError";
+import TypingIndicator from "../components/ui/TypingIndicator";
+
+const MyRooms = () => {
+  const [loading, setLoading] = useState(false);
+  const [rooms, setRooms] = useState([]);
+  const [nextUrl, setNextUrl] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef();
+
+  const fetchMyRooms = async (url = null, append = false) => {
+    setLoading(true);
+
+    try {
+      const { data } = await getMyRooms(url);
+      setRooms(prev => (append ? [...prev, ...data.results] : data.results));
+      setNextUrl(data.next);
+      setHasMore(Boolean(data.next));
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const lastRoomElementRef = useCallback(
+    node => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && hasMore && nextUrl) {
+          fetchMyRooms(nextUrl, true);
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore, nextUrl]
+  );
+
+  useEffect(() => {
+    fetchMyRooms();
+  }, []);
+
+  return (
+    <div className="min-h-screen px-4 py-8">
+      <div className="max-w-4xl mx-auto">
+        <BackButton />
+
+        {/* Rooms List */}
+        <div className="space-y-4">
+          {rooms.map((room, index) => (
+            <div
+              key={room.id}
+              ref={index === rooms.length - 1 ? lastRoomElementRef : null}
+              className="card-primary animate-chat-appear hover:border-accent-primary/50 cursor-pointer"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-xl font-semibold">{room.name}</h3>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        room.status === "active"
+                          ? "bg-accent-primary/20 text-accent-primary"
+                          : "bg-text-muted/20 text-text-muted"
+                      }`}
+                    >
+                      {room.status}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-text-secondary">
+                    <span>
+                      {room.participant_count}/{room.limit} participants
+                    </span>
+                    <span>
+                      Created {new Date(room.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <ChatButton variant="secondary" className="text-sm px-4 py-2">
+                    Settings
+                  </ChatButton>
+
+                  <ChatButton variant="primary" className="text-sm px-4 py-2">
+                    Enter Room
+                  </ChatButton>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Empty state */}
+        {!loading && rooms.length === 0 && (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">💬</div>
+            <h3 className="text-xl font-semibold mb-2">No rooms yet</h3>
+            <p className="text-text-secondary mb-6">
+              Create your first chat room from the Dashboard
+            </p>
+          </div>
+        )}
+
+        {/* Single TypingIndicator */}
+        {loading && (
+          <div className="flex justify-center items-center w-full py-6">
+            <TypingIndicator />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default MyRooms;
