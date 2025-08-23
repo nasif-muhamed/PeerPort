@@ -6,6 +6,7 @@ import ChatInput from "../components/ChatInput";
 import TypingIndicator from "../components/ui/TypingIndicator";
 import { getAllRooms } from "../services/api/api_service";
 import { handleError } from "../utils/handleError";
+import { useDebounce } from "../hooks/useDebounce"
 
 const AllRooms = () => {
   const [loading, setLoading] = useState(false);
@@ -13,11 +14,12 @@ const AllRooms = () => {
   const [nextUrl, setNextUrl] = useState(null);
   const observer = useRef();
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const fetchAllRooms = async (url = null, append = false) => {
     setLoading(true);
     try {
-      const { data } = await getAllRooms(url);
+      const { data } = await getAllRooms(url, searchTerm);
       setRooms(prev => (append ? [...prev, ...data.results] : data.results));
       setNextUrl(data.next);
     } catch (error) {
@@ -45,17 +47,19 @@ const AllRooms = () => {
 
   useEffect(() => {
     fetchAllRooms();
-  }, []);
+  }, [debouncedSearchTerm]);
 
   return (
     <div className="min-h-screen px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <BackButton to="/dashboard" />
 
         {/* Search */}
-        <div className="mb-8">
+        <div className="mb-8 flex items-center gap-5">
+          <BackButton to="/dashboard" className="mb-0" />
+
           <div className="max-w-md">
             <ChatInput
+              name={'search'}
               placeholder="Search rooms..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
