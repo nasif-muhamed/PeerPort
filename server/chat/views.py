@@ -35,8 +35,13 @@ class PublicAllRoomListView(ListAPIView):
     pagination_class = CommonPagination
 
     def get_queryset(self):
-        return (
-            Room.objects.filter(status=Room.ACTIVE).select_related('owner').all()
-            .annotate(participant_count=Count("participants"))
-            .order_by("-created_at")
-        )
+        search_term = self.request.query_params.get('search', None)
+        queryset = Room.objects.filter(status=Room.ACTIVE).select_related('owner').all()
+        queryset = queryset.annotate(participant_count=Count("participants"))
+
+        if search_term:
+            queryset = queryset.filter(
+                name__icontains=search_term
+            )
+
+        return queryset.order_by("-created_at")
