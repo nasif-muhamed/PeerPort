@@ -2,25 +2,22 @@ import { useState, useEffect, useCallback, useRef } from "react";
 
 import BackButton from "../components/BackButton";
 import ChatButton from "../components/ChatButton";
+import TypingIndicator from "../components/ui/TypingIndicator";
 import { getMyRooms } from "../services/api/api_service";
 import { handleError } from "../utils/handleError";
-import TypingIndicator from "../components/ui/TypingIndicator";
 
 const MyRooms = () => {
   const [loading, setLoading] = useState(false);
   const [rooms, setRooms] = useState([]);
   const [nextUrl, setNextUrl] = useState(null);
-  const [hasMore, setHasMore] = useState(true);
   const observer = useRef();
 
   const fetchMyRooms = async (url = null, append = false) => {
     setLoading(true);
-
     try {
       const { data } = await getMyRooms(url);
       setRooms(prev => (append ? [...prev, ...data.results] : data.results));
       setNextUrl(data.next);
-      setHasMore(Boolean(data.next));
     } catch (error) {
       handleError(error);
     } finally {
@@ -34,14 +31,14 @@ const MyRooms = () => {
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting && hasMore && nextUrl) {
+        if (entries[0].isIntersecting && nextUrl) {
           fetchMyRooms(nextUrl, true);
         }
       });
 
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore, nextUrl]
+    [loading, nextUrl]
   );
 
   useEffect(() => {
@@ -53,7 +50,6 @@ const MyRooms = () => {
       <div className="max-w-4xl mx-auto">
         <BackButton />
 
-        {/* Rooms List */}
         <div className="space-y-4">
           {rooms.map((room, index) => (
             <div
@@ -99,7 +95,6 @@ const MyRooms = () => {
           ))}
         </div>
 
-        {/* Empty state */}
         {!loading && rooms.length === 0 && (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">💬</div>
@@ -110,7 +105,6 @@ const MyRooms = () => {
           </div>
         )}
 
-        {/* Single TypingIndicator */}
         {loading && (
           <div className="flex justify-center items-center w-full py-6">
             <TypingIndicator />

@@ -10,6 +10,7 @@ import Register from "../pages/Register";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import MyRooms from "../pages/MyRooms";
+import AllRooms from "../pages/AllRooms";
 import NotFound from "../pages/NotFound";
 
 const AppRoutes = () => {
@@ -26,6 +27,7 @@ const AppRoutes = () => {
       <Route element={<ProtectedRoute/>}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/my-rooms" element={<MyRooms />} />
+        <Route path="/all-rooms" element={<AllRooms />} />
       </Route>
 
       {/* 404 Page */}

@@ -40,7 +40,7 @@ api.interceptors.response.use(
           try {
             // Attempt to refresh the token
             const response = await getRefreshToken({refresh: refreshToken})
-            console.log('Current access token:', getAccessToken());
+            console.log('Current access token:', store.getState().auth.accessToken);
             console.log('New access token:', response.data.access);
             
             // Update the access token

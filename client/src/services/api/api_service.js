@@ -10,3 +10,4 @@ export const logoutUser = (data) => api.post("users/logout/", data);
 // chat
 export const createRoom = (data) => api.post("chats/rooms/", data);
 export const getMyRooms = (url) => api.get(url || "chats/rooms/");
+export const getAllRooms = (url) => api.get(url || "chats/all-rooms/");
