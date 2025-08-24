@@ -1,17 +1,21 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+from ..services import permission_to_join_room
+
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-        self.room_group_name = f"chat_{self.room_name}"
+        self.user = self.scope["user"]
+        self.room_group_name = f"chat_{self.user.id}"
 
-        # Join room group
+        # if not await permission_to_join_room(self.user, self.room_id):
+        #     await self.close()
+        #     return
+        
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
-
         await self.accept()
 
     async def disconnect(self, close_code):

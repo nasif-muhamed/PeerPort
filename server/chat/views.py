@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, ListCreateAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Room, Message
 from .serializers import RoomOwnerSerializer, PublicRoomSerializer
@@ -45,3 +45,12 @@ class PublicAllRoomListView(ListAPIView):
             )
 
         return queryset.order_by("-created_at")
+
+class PublicRoomDetailView(RetrieveAPIView):
+    serializer_class = PublicRoomSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Room.objects.filter(status=Room.ACTIVE).select_related("owner").annotate(
+            participant_count=Count("participants")
+        )
