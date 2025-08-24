@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 import BackButton from "../components/BackButton";
 import ChatButton from "../components/ChatButton";
@@ -12,8 +13,9 @@ const AllRooms = () => {
   const [loading, setLoading] = useState(false);
   const [rooms, setRooms] = useState([]);
   const [nextUrl, setNextUrl] = useState(null);
-  const observer = useRef();
   const [searchTerm, setSearchTerm] = useState("");
+  const observer = useRef();
+  const navigate = useNavigate()
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const fetchAllRooms = async (url = null, append = false) => {
@@ -49,13 +51,17 @@ const AllRooms = () => {
     fetchAllRooms();
   }, [debouncedSearchTerm]);
 
+  const handleJoinRoom = (roomId) => {
+    navigate(`/chat/${roomId}`)
+  }
+
   return (
     <div className="min-h-screen px-4 py-8">
       <div className="max-w-4xl mx-auto">
 
         {/* Search */}
         <div className="mb-8 flex items-center gap-5">
-          <BackButton to="/dashboard" className="mb-0" />
+          <BackButton className="!mb-0" />
 
           <div className="max-w-md">
             <ChatInput
@@ -94,9 +100,10 @@ const AllRooms = () => {
                 <ChatButton 
                   variant="primary" 
                   className="text-sm px-4 py-2"
-                  disabled={room.participants >= room.limit}
+                  disabled={room.participant_count >= room.limit}
+                  onClick={room.participant_count < room.limit ? () => handleJoinRoom(room.id) : null}
                 >
-                  {room.participants >= room.limit ? 'Room Full' : 'Join Room'}
+                  {room.participant_count >= room.limit ? 'Room Full' : 'Join Room'}
                 </ChatButton>
               </div>
             </div>

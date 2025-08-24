@@ -11,3 +11,4 @@ export const logoutUser = (data) => api.post("users/logout/", data);
 export const createRoom = (data) => api.post("chats/rooms/", data);
 export const getMyRooms = (url) => api.get(url || "chats/rooms/");
 export const getAllRooms = (url, searchTerm) => api.get(url || "chats/all-rooms/", {params: {search: searchTerm}});
+export const getRoomDetials = (roomId) => api.get(`/chats/chat/${roomId}`)

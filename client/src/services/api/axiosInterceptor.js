@@ -24,7 +24,7 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-
+    console.log('her:', error.response?.data?.error, error.status)
     // Check if the error is due to an expired token
     if (error.response?.status === 401 && !originalRequest._retry) {
       console.log('Error: Refreshing token due to expired token');
@@ -58,6 +58,13 @@ api.interceptors.response.use(
         }
       }
     }
+    console.log('outside')
+    if (error.status === 400 && error.response?.data?.error.toLowerCase().includes("invalid token")) {
+      console.log('inside')
+      console.warn("Invalid token detected, logging out user...");
+      store.dispatch(loguout());
+    }
+
     return Promise.reject(error);
   }
 );

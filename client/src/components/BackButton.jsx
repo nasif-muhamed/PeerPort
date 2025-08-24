@@ -15,7 +15,7 @@ const BackButton = ({ to, className = "" }) => {
   return (
     <button
       onClick={handleBack}
-      className={`flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200 mb-6 ${className}`}
+      className={`${className} flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200 mb-6`}
     >
       <IoMdArrowRoundBack className="w-5 h-5"/>
       <span className="hidden md:block">Back</span>
