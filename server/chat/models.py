@@ -38,6 +38,11 @@ class Room(models.Model):
         """Check if room is full or not"""
         return self.participants.count() < self.limit
 
+    # Add the owner to participants on creation of a new room.
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.participants.filter(id=self.owner.id).exists():
+            self.participants.add(self.owner)
 
 class Message(models.Model):
     TYPE_CHOICES = (
@@ -50,6 +55,9 @@ class Message(models.Model):
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='text')
     content = models.TextField(blank=False, null=False)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
 
     def __str__(self):
         return f"{self.sender.username} in {self.room.name}"
