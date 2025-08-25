@@ -1,7 +1,7 @@
 import api from "./axiosInstance";
 import { store } from "../../global-state/app/store"; 
-import { updateAcess, loguout } from "../../global-state/features/authSlice";
-import { getRefreshToken } from "./api_service";
+import { updateAccess, logout } from "../../global-state/features/authSlice";
+import { getRefreshToken } from "./apiService";
 
 // Request interceptor
 api.interceptors.request.use(
@@ -24,7 +24,14 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-    console.log('her:', error.response?.data?.error, error.status)
+
+    // Handle network errors
+    if (!error.response) {
+      console.error('Network error:', error.message);
+      return Promise.reject(error);
+    }
+
+    console.log('Error details:', error.response?.data, error.response?.status);
     // Check if the error is due to an expired token
     if (error.response?.status === 401 && !originalRequest._retry) {
       console.log('Error: Refreshing token due to expired token');
@@ -44,7 +51,7 @@ api.interceptors.response.use(
             console.log('New access token:', response.data.access);
             
             // Update the access token
-            store.dispatch(updateAcess({ access: response.data.access }));
+            store.dispatch(updateAccess({ access: response.data.access }));
 
             // Retry the original request with the new token
             originalRequest.headers.Authorization = `Bearer ${response.data.access}`;
@@ -52,7 +59,7 @@ api.interceptors.response.use(
           } catch (refreshError) {
             // Handle error if token refresh fails
             console.error('Token refresh failed:', refreshError);
-            store.dispatch(loguout()); // clear tokens on failure
+            store.dispatch(logout()); // clear tokens on failure
             return Promise.reject(refreshError);
           }
         }
@@ -62,7 +69,7 @@ api.interceptors.response.use(
     if (error.status === 400 && error.response?.data?.error.toLowerCase().includes("invalid token")) {
       console.log('inside')
       console.warn("Invalid token detected, logging out user...");
-      store.dispatch(loguout());
+      store.dispatch(logout());
     }
 
     return Promise.reject(error);

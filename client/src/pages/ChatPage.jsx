@@ -1,25 +1,25 @@
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
 import BackButton from "../components/BackButton";
-import ChatInput from "../components/ChatInput";
-import ChatBubble from "../components/ChatBubble";
-import ChatButton from "../components/ChatButton";
 import ChatLoader from "../components/ui/ChatLoader";
-import TypingIndicator from "../components/ui/TypingIndicator";
-import { getRoomDetials } from "../services/api/api_service";
-import { handleError} from "../utils/handleError"
+import MessageInput from "../components/chat-page/MessageInput";
+import { getRoomDetials, getMessages } from "../services/api/apiService";
+import { handleError } from "../utils/handleError"
+import ChatEventHandler from "../components/chat-page/ChatEventHandler";
+import MessageArea from "../components/chat-page/MessageArea";
 
 const ChatPage = () => {
   const { roomId } = useParams();
-  const navigate = useNavigate();
-  const messagesEndRef = useRef(null);
-  
+  const navigate = useNavigate()  
   const [loading, setLoading] = useState(false)
-  const [chatLoading, setChatLoading] = useState(false)
-  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [room, setRoom] = useState({});
+  const [chatLoading, setChatLoading] = useState(false)
+  
+  // Pagination state
+  const [loadingOlderMessages, setLoadingOlderMessages] = useState(false);
+  const [nextPageUrl, setNextPageUrl] = useState(null);
+  const [hasMoreMessages, setHasMoreMessages] = useState(true);
 
   const fetchRoomDetails = async () => {
     setLoading(true)
@@ -34,42 +34,57 @@ const ChatPage = () => {
     }
   }
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
-    
-    const newMessage = {
-      id: messages.length + 1,
-      text: message,
-      sender: "You",
-      timestamp: new Date(),
-      type: "sent"
-    };
-    
-    setMessages([...messages, newMessage]);
-    setMessage("");
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
   useEffect(() => {
     fetchRoomDetails()
   }, [])
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  const fetchMessages = async () => {
+    try {
+      const { data } = await getMessages(roomId);
+      setMessages(data?.results || [])
+      setNextPageUrl(data?.next || null)
+      setHasMoreMessages(!!data?.next)
+    } catch (error) {
+      handleError(error)
+    } finally {
+      setChatLoading(false)
+    }
+  }
 
-  const formatTime = (timestamp) => {
-    return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // Function to load older messages
+  const loadOlderMessages = async () => {
+    if (!nextPageUrl || loadingOlderMessages) return;
+
+    setLoadingOlderMessages(true);
+    try {
+      // Extract the page parameter from the next URL
+      const url = new URL(nextPageUrl);
+      const page = url.searchParams.get('page');
+      
+      // Call your API service with the page parameter
+      const { data } = await getMessages(roomId, page);
+      
+      // Prepend older messages to the current messages array
+      setMessages(prevMessages => [...(data?.results || []), ...prevMessages]);
+      
+      // Update pagination state
+      setNextPageUrl(data?.next || null);
+      setHasMoreMessages(!!data?.next);
+      
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setLoadingOlderMessages(false);
+    }
   };
-
+  
   return (
     <div className="flex h-screen overflow-hidden">
+      <ChatEventHandler 
+        roomId={roomId}
+        setMessages={setMessages}
+        fetchMessages={fetchMessages}
+      />
       {loading && <ChatLoader/>}
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
@@ -85,64 +100,21 @@ const ChatPage = () => {
                 </p>
               </div>
             </div>
+            {/* <button className="text-red-500 hover:text-red-400 font-medium px-3 py-1 hover:bg-red-500/10 rounded transition-colors">
+              Leave Room
+            </button> */}
           </div>
         </div>
-
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {chatLoading && <div className="flex justify-center">
-            <TypingIndicator />
-          </div>}
-          {messages.map((msg) => (
-            <div key={msg.id} className="animate-chat-appear">
-              {msg.type === 'system' ? (
-                <div className="text-center">
-                  <span className="text-text-muted text-sm bg-background-secondary px-3 py-1 rounded-full">
-                    {msg.text}
-                  </span>
-                </div>
-              ) : (
-                <div className={`flex ${msg.type === 'sent' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-xs lg:max-w-md ${msg.type === 'sent' ? 'order-2' : 'order-1'}`}>
-                    {msg.type === 'received' && (
-                      <p className="text-text-secondary text-xs mb-1 px-3">{msg.sender}</p>
-                    )}
-                    <ChatBubble variant={msg.type === 'sent' ? 'sent' : 'received'}>
-                      <p className="break-words">{msg.text}</p>
-                      <p className="text-xs opacity-70 mt-1">{formatTime(msg.timestamp)}</p>
-                    </ChatBubble>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-
+        <MessageArea 
+          messages={messages} 
+          chatLoading={chatLoading}
+          loadingOlderMessages={loadingOlderMessages}
+          onLoadMore={loadOlderMessages}
+          hasMoreMessages={hasMoreMessages}
+        />
         {/* Message Input */}
-        <div className="border-t border-border-primary rounded-none p-4">
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <ChatInput
-                name={'chat-input'}
-                placeholder="Type a message..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                variant="received"
-                className="w-full max-w-full"
-              />
-            </div>
-            <ChatButton
-              variant="send"
-              onClick={handleSendMessage}
-              disabled={!message.trim()}
-              className="px-5 font-bold"
-            >
-              Send
-            </ChatButton>
-          </div>
-        </div>
+        <MessageInput roomId={roomId} setMessages={setMessages} />
       </div>
     </div>
   );

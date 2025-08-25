@@ -8,7 +8,7 @@ import ChatButton from "../components/ChatButton";
 import ChatBubble from "../components/ChatBubble";
 import validateRegisterFormData from "../utils/validations/validateRegisterFormData"
 import ChatLoader from "../components/ui/ChatLoader";
-import { registerUser } from "../services/api/api_service"
+import { registerUser } from "../services/api/apiService"
 import { handleError } from "../utils/handleError";
 
 const Register = () => {

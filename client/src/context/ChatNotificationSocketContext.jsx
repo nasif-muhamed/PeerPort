@@ -1,11 +1,11 @@
-import { useState, useEffect, useContext, createContext } from 'react'
-import { useAuthTokens } from '../hooks/useAuthTokens';
+import { useState, useEffect, useContext, createContext, useCallback } from "react";
+import { useAuthTokens } from "../hooks/useAuthTokens";
 
 const ChatNotificationSocketContext = createContext();
 
-export const ChatNotificationSocketProvider = ({children, endpoint}) => {
-  const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || 'ws://localhost:8000';
-  const { accessToken } = useAuthTokens()
+export const ChatNotificationSocketProvider = ({ children, endpoint }) => {
+  const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || "ws://localhost:8000";
+  const { accessToken } = useAuthTokens();
   const [ws, setWs] = useState(null);
 
   useEffect(() => {
@@ -13,20 +13,49 @@ export const ChatNotificationSocketProvider = ({children, endpoint}) => {
 
     const websocket = new WebSocket(`${WS_BASE_URL}${endpoint}?token=${accessToken}`);
 
-    websocket.onopen = () => console.log('Chat WebSocket connected with access:', accessToken);
-    websocket.onerror = (error) => console.error('Chat WebSocket error:', error);
-    websocket.onclose = () => console.log('Chat WebSocket disconnected');
+    websocket.onopen = () => {
+      console.log("Chat WebSocket connected");
+      setWs(websocket);
+    };
 
-    setWs(websocket);
+    websocket.onerror = (error) => {
+      console.error("Chat WebSocket error:", error);
+    };
 
-    return () => websocket.close();
+    websocket.onclose = () => {
+      console.log("Chat WebSocket disconnected");
+      setWs(null);
+    };
+
+    return () => {
+      websocket.close();
+    };
   }, [accessToken, endpoint]);
 
+  const wsSend = useCallback(
+    (msg) => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(msg));
+      } else {
+        console.warn("WebSocket is not connected");
+      }
+    },
+    [ws]
+  );
+
+  const wsListen = useCallback(
+    (callback) => {
+      if (!ws) return;
+      ws.onmessage = (event) => callback(JSON.parse(event.data));
+    },
+    [ws]
+  );
+
   return (
-    <ChatNotificationSocketContext.Provider value={ws}>
+    <ChatNotificationSocketContext.Provider value={{ wsSend, wsListen }}>
       {children}
     </ChatNotificationSocketContext.Provider>
-  )
-}
+  );
+};
 
 export const useWebSocket = () => useContext(ChatNotificationSocketContext);

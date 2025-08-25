@@ -1,16 +1,16 @@
 import { useSelector, useDispatch } from "react-redux";
-import { login, updateAcess, updateRefresh, loguout } from "../global-state/features/authSlice";
+import { login, updateAccess, updateRefresh, logout } from "../global-state/features/authSlice";
 
 export const useAuthTokens = () => {
-  const { accessToken, refreshToken } = useSelector((state) => state.auth);
+  const { username, userId, accessToken, refreshToken } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const setTokens = (access, refresh) => {
-    dispatch(login({ access, refresh }));
+  const setTokensAndUser = (userId, username, access, refresh) => {
+    dispatch(login({ userId, username, access, refresh }));
   };
 
   const setAccess = (access) => {
-    dispatch(updateAcess({ access }));
+    dispatch(updateAccess({ access }));
   };
 
   const setRefresh = (refresh) => {
@@ -18,13 +18,15 @@ export const useAuthTokens = () => {
   };
 
   const clearTokens = () => {
-    dispatch(loguout());
+    dispatch(logout());
   };
 
   return {
+    username,
+    userId,
     accessToken,
     refreshToken,
-    setTokens,
+    setTokensAndUser,
     setAccess,
     setRefresh,
     clearTokens,

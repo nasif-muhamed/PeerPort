@@ -6,7 +6,7 @@ import ChatButton from "./ChatButton";
 import ChatBubble from "./ChatBubble";
 import validateCreateRoomFormData from "../utils/validations/validateCreateRoomFormData";
 import ChatLoader from "./ui/ChatLoader";
-import { createRoom } from "../services/api/api_service";
+import { createRoom } from "../services/api/apiService";
 import { handleError } from "../utils/handleError";
 
 const CreateRoomModal = ({ onClose }) => {

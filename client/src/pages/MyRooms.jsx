@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 import BackButton from "../components/BackButton";
 import ChatButton from "../components/ChatButton";
 import TypingIndicator from "../components/ui/TypingIndicator";
-import { getMyRooms } from "../services/api/api_service";
+import { getMyRooms } from "../services/api/apiService";
 import { handleError } from "../utils/handleError";
 
 const MyRooms = () => {
@@ -11,6 +12,7 @@ const MyRooms = () => {
   const [rooms, setRooms] = useState([]);
   const [nextUrl, setNextUrl] = useState(null);
   const observer = useRef();
+  const navigate = useNavigate()
 
   const fetchMyRooms = async (url = null, append = false) => {
     setLoading(true);
@@ -44,6 +46,14 @@ const MyRooms = () => {
   useEffect(() => {
     fetchMyRooms();
   }, []);
+
+  const handleJoinRoom = (roomId) => {
+    navigate(`/chat/${roomId}`)
+  }
+
+  const handleRoomSetting = (roomId) => {
+    navigate(`/room-settings/${roomId}`)
+  }
 
   return (
     <div className="min-h-screen px-4 py-8">
@@ -82,11 +92,11 @@ const MyRooms = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <ChatButton variant="secondary" className="text-sm px-4 py-2">
+                  <ChatButton onClick={() => handleRoomSetting(room.id)} variant="secondary" className="text-sm px-4 py-2">
                     Settings
                   </ChatButton>
 
-                  <ChatButton variant="primary" className="text-sm px-4 py-2">
+                  <ChatButton onClick={() => handleJoinRoom(room.id)} variant="primary" className="text-sm px-4 py-2">
                     Enter Room
                   </ChatButton>
                 </div>

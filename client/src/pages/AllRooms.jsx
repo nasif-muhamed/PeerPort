@@ -5,7 +5,7 @@ import BackButton from "../components/BackButton";
 import ChatButton from "../components/ChatButton";
 import ChatInput from "../components/ChatInput";
 import TypingIndicator from "../components/ui/TypingIndicator";
-import { getAllRooms } from "../services/api/api_service";
+import { getAllRooms } from "../services/api/apiService";
 import { handleError } from "../utils/handleError";
 import { useDebounce } from "../hooks/useDebounce"
 
@@ -94,16 +94,16 @@ const AllRooms = () => {
               
               <div className="flex items-center justify-between gap-4">
                 <div className="text-sm text-text-secondary">
-                  <span>{room.participants}/{room.limit} participants</span>
+                  <span>{room.participant_count}/{room.limit} participants</span>
                 </div>
                 
                 <ChatButton 
                   variant="primary" 
                   className="text-sm px-4 py-2"
-                  disabled={room.participant_count >= room.limit}
-                  onClick={room.participant_count < room.limit ? () => handleJoinRoom(room.id) : null}
+                  disabled={room.participant_count >= room.limit && !room.is_participant}
+                  onClick={room.participant_count < room.limit || room.is_participant ? () => handleJoinRoom(room.id) : null}
                 >
-                  {room.participant_count >= room.limit ? 'Room Full' : 'Join Room'}
+                  {room.is_participant ? 'Join Chat' : room.participant_count >= room.limit ? 'Room Full' : 'Join Room'}
                 </ChatButton>
               </div>
             </div>

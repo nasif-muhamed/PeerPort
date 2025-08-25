@@ -13,6 +13,7 @@ import Dashboard from "../pages/Dashboard";
 import MyRooms from "../pages/MyRooms";
 import AllRooms from "../pages/AllRooms";
 import ChatPage from "../pages/ChatPage";
+import RoomSettings from "../pages/RoomSettings";
 import NotFound from "../pages/NotFound";
 
 const AppRoutes = () => {
@@ -31,6 +32,7 @@ const AppRoutes = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/my-rooms" element={<MyRooms />} />
           <Route path="/all-rooms" element={<AllRooms />} />
+          <Route path="/room-settings/:roomId" element={<RoomSettings />} />
         </Route>
         <Route path="/chat/:roomId" element={<ChatPage />} />
       </Route>
