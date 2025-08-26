@@ -5,15 +5,14 @@ import { toast } from 'sonner';
 
 import { useAuthTokens } from '../../hooks/useAuthTokens';
 import { persistor } from '../../global-state/app/store';
-import { logoutUser } from '../../services/api/api_service';
+import { logoutUser } from '../../services/api/apiService';
 import { handleError } from '../../utils/handleError'
 
 const ChatNavbar = ({
-  username = "User",
   className = ""
 }) => {
   const navigate = useNavigate();
-  const { refreshToken, clearTokens } = useAuthTokens();
+  const { username, refreshToken, clearTokens } = useAuthTokens();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {

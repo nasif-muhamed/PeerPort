@@ -7,13 +7,14 @@ import ChatInput from "../components/ChatInput";
 import ChatButton from "../components/ChatButton";
 import ChatBubble from "../components/ChatBubble";
 import ChatLoader from "../components/ui/ChatLoader";
-import { loginUser } from "../services/api/api_service"
+import validateLoginFormData from "../utils/validations/validateLoginFormData"
+import { loginUser } from "../services/api/apiService"
 import { handleError } from "../utils/handleError";
 import { useAuthTokens } from "../hooks/useAuthTokens";
 
 const Login = () => {
   const [loading, setLoading] = useState(false)
-  const { setTokens } = useAuthTokens()
+  const { setTokensAndUser } = useAuthTokens()
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -29,16 +30,17 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.username.trim()){
-      toast.error('Username is required')
-    }
-    if (!formData.password.trim()){
-      toast.error('Password is required')
-    }
+
+    const {isValid, errorMessage} = validateLoginFormData(formData);
+    if (!isValid) {
+      toast.error(errorMessage);
+      return;
+    };
+
     try{
       setLoading(true)
-      const response = await loginUser(formData)
-      setTokens(response?.data?.access, response?.data?.refresh);
+      const { data } = await loginUser(formData)
+      setTokensAndUser(data?.user?.id, data?.user?.username, data?.access, data?.refresh);
       navigate('/dashboard')
     }catch (error) {
       handleError(error)

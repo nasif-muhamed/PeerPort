@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import CreateRoomModal from "../components/CreateRoomModal";
 
 const Dashboard = () => {
+  const [showCreateModal, setShowCreateModal] = useState(false);
   return (
     <div className="min-h-screen px-4 py-8">
       <div className="max-w-4xl mx-auto">
@@ -42,7 +45,7 @@ const Dashboard = () => {
           </div>
 
           {/* Create Room */}
-          <div className="flex justify-start animate-chat-appear">
+          <div onClick={() => setShowCreateModal(true)} className="flex justify-start animate-chat-appear">
             <div className="bg-chat-received text-text-primary rounded-2xl rounded-bl-md px-6 py-4 mr-auto max-w-md cursor-pointer hover:bg-chat-received-hover transition-colors">
               <div className="flex items-center gap-3">
                 <div className="text-2xl">➕</div>
@@ -56,7 +59,7 @@ const Dashboard = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid md:grid-cols-3 gap-6 mt-16">
+        {/* <div className="grid md:grid-cols-3 gap-6 mt-16">
           <div className="card-primary text-center animate-fade-in">
             <div className="text-3xl font-bold text-accent-primary mb-2">3</div>
             <p className="text-text-secondary">Active Rooms</p>
@@ -69,8 +72,12 @@ const Dashboard = () => {
             <div className="text-3xl font-bold text-text-accent mb-2">5</div>
             <p className="text-text-secondary">Rooms Joined</p>
           </div>
-        </div>
+        </div> */}
       </div>
+
+      {showCreateModal && (
+        <CreateRoomModal onClose={() => setShowCreateModal(false)} />
+      )}
     </div>
   );
 };

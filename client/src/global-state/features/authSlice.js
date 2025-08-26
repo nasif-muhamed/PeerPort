@@ -1,9 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { persistor } from "../app/store";
 
 const initialState = {
   accessToken: null,
   refreshToken: null,
+  username: null,
+  userId: null,
 };
 
 const authSlice = createSlice({
@@ -11,21 +12,25 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
+      state.userId = action.payload.userId;
+      state.username = action.payload.username;
       state.accessToken = action.payload.access;
       state.refreshToken = action.payload.refresh;
     },
-    updateAcess: (state, action) => {
+    updateAccess: (state, action) => {
       state.accessToken = action.payload.access;
     },
     updateRefresh: (state, action) => {
       state.refreshToken = action.payload.refresh;
-    },    
-    loguout: (state) => {
+    },
+    logout: (state) => {
       state.accessToken = null;
       state.refreshToken = null;
+      state.username = null;
+      state.userId = null;
     },
   },
 });
 
-export const { login, updateAcess, updateRefresh, loguout } = authSlice.actions;
+export const { login, updateAccess, updateRefresh, logout } = authSlice.actions;
 export default authSlice.reducer;

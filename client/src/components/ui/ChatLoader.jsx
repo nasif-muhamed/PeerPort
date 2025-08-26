@@ -1,4 +1,5 @@
 import ChatBubble from "../ChatBubble";
+import TypingIndicator from "./TypingIndicator";
 
 const ChatLoader = ({ message = "Processing your request..." }) => {  
   return (
@@ -13,13 +14,7 @@ const ChatLoader = ({ message = "Processing your request..." }) => {
         </div>
         
         <div className="flex justify-end">
-          <div className="bg-chat-sent rounded-2xl rounded-br-md px-4 py-3 animate-chat-appear">
-            <div className="flex space-x-1">
-              <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-            </div>
-          </div>
+          <TypingIndicator/>
         </div>
       </div>
     </div>

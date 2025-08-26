@@ -1,11 +1,11 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 import { useAuthTokens } from "../../hooks/useAuthTokens";
-import AuthenticatedLayout from "../../components/Layout/AuthenticatedLayout";
+import { ChatNotificationSocketProvider } from '../../context/ChatNotificationSocketContext'; 
 
 const ProtectedRoute = () => {
   const { accessToken } = useAuthTokens()
-  return accessToken ? <AuthenticatedLayout><Outlet/></AuthenticatedLayout> : <Navigate to={'/'}/>
+  return accessToken ? <ChatNotificationSocketProvider endpoint={'/ws/'}><Outlet/></ChatNotificationSocketProvider> : <Navigate to={'/'}/>
 }
 
 export default ProtectedRoute
