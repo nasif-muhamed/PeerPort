@@ -4,12 +4,13 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.exceptions import PermissionDenied
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Room, Message
-from .serializers import RoomOwnerSerializer, PublicRoomSerializer, MessageSerializer
+from .serializers import RoomOwnerSerializer, RoomOwnerDetailSerializer, PublicRoomSerializer, MessageSerializer
 from peer_port.pagination import CommonPagination
+
 
 logger = logging.getLogger(__name__)
 
@@ -23,11 +24,22 @@ class OwnerRoomListCreateAPIView(ListCreateAPIView):
         return (
             Room.objects.filter(owner=self.request.user)
             .annotate(participant_count=Count("participants"))
-            .order_by("-created_at")
         )
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class OwnerSingleRoomAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = RoomOwnerDetailSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return (
+            Room.objects.filter(owner=self.request.user)
+            .prefetch_related('participants')
+        )
 
 
 class PublicAllRoomListView(ListAPIView):

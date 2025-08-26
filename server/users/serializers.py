@@ -35,7 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
     
 
-# using in: PublicRoomSerializer
+# using in: RoomOwnerDetailSerializer, PublicRoomSerializer
 class MiniUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

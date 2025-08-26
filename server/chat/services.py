@@ -18,19 +18,19 @@ def permission_to_join_room(user, room_id):
         if room.participants.filter(id=user.id).exists():
             return True, False
         if room.limit <= room.participants.count():
-            return False
+            return False, False
         if room.access == Room.PUBLIC:
             room.participants.add(user)
             room.save(update_fields=[])
             print('join inside room count:', room.participants.count())
             return True, True
         else:
-            return False
+            return False, False
     except Room.DoesNotExist:
-        return False
+        return False, False
     except Exception as e:
         logger.error(f"Error adding user to room: {e}")
-        return False
+        return False, False
 
 
 @database_sync_to_async

@@ -14,7 +14,7 @@ class MiniMessageSerializer(serializers.ModelSerializer):
 
 
 class RoomOwnerSerializer(serializers.ModelSerializer):
-    participant_count = serializers.SerializerMethodField()
+    participant_count = serializers.IntegerField(read_only=True)
     name = serializers.CharField(validators=[validate_name])
     access = serializers.CharField(validators=[validate_access], required=False)
     status = serializers.CharField(validators=[validate_status], required=False)
@@ -26,8 +26,12 @@ class RoomOwnerSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'access', 'status', 'limit', 'participant_count', 'last_message', 'created_at', 'updated_at']
         read_only_fields = ['id', 'participant_count', 'last_message', 'created_at', 'updated_at']
 
-    def get_participant_count(self, obj):
-        return getattr(obj, "participant_count", obj.participants.count())
+
+class RoomOwnerDetailSerializer(RoomOwnerSerializer):
+    participants = MiniUserSerializer(many=True, read_only=True)
+
+    class Meta(RoomOwnerSerializer.Meta):
+        fields = [field for field in RoomOwnerSerializer.Meta.fields if not (field == 'participant_count' or field == 'last_message')] + ['participants']
 
 
 class PublicRoomSerializer(serializers.ModelSerializer):

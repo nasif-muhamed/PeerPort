@@ -31,6 +31,9 @@ class Room(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ["-created_at"]
+
     def __str__(self):
         return f"{self.name} ({self.get_access_display()})"
 
@@ -43,6 +46,7 @@ class Room(models.Model):
         super().save(*args, **kwargs)
         if not self.participants.filter(id=self.owner.id).exists():
             self.participants.add(self.owner)
+
 
 class Message(models.Model):
     TYPE_CHOICES = (
