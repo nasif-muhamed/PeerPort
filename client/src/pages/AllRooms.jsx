@@ -61,7 +61,7 @@ const AllRooms = () => {
 
         {/* Search */}
         <div className="mb-8 flex items-center gap-5">
-          <BackButton className="!mb-0" />
+          <BackButton to={'/dashboard'} className="!mb-0" />
 
           <div className="max-w-md">
             <ChatInput

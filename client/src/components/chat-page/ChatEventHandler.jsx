@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useWebSocket } from "../../context/ChatNotificationSocketContext";
 import { toast } from "sonner";
 import { useAuthTokens } from "../../hooks/useAuthTokens"
-
-
+  
 const ChatEventHandler = ({ roomId, setMessages, fetchMessages }) => {
+  const DEBUG_MODE = import.meta.env.VITE_APP_DEBUG === 'true';
   const { wsSend, wsListen } = useWebSocket();
   const { userId, username } = useAuthTokens()
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const ChatEventHandler = ({ roomId, setMessages, fetchMessages }) => {
 
     // listen to the recieving messages.
     wsListen((data) => {
-      console.log('ws listen:', data)
+      if (DEBUG_MODE) console.log('ws listen:', data)
       if (data.type === "chat_recieved") {
         const sender = data.payload?.sender
         const message = data.payload?.message
@@ -45,7 +45,6 @@ const ChatEventHandler = ({ roomId, setMessages, fetchMessages }) => {
         }
       } 
       else if (data.type === "join_denied") {
-        setIsJoined(false)
         toast.error(data.payload.reason || "Failed to join the room.");
         navigate("/all-rooms");
       } 
@@ -53,7 +52,6 @@ const ChatEventHandler = ({ roomId, setMessages, fetchMessages }) => {
         const messageRoomId = data.room_id;
         const subType = data.sub_type;
         const senderId = data.payload?.sender_id
-        console.log('outside')
         if (subType === 'joined' && senderId == userId) {
           fetchMessages()
           return

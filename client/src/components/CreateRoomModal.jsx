@@ -118,7 +118,7 @@ const CreateRoomModal = ({ onClose }) => {
                 required
               >
                 <option value="public">Yes, make it public</option>
-                <option value="private">No, keep it private</option>
+                {/* <option value="private">No, keep it private</option> */}
               </select>
             </div>
 

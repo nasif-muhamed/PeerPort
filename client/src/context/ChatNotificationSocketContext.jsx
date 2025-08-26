@@ -5,6 +5,7 @@ const ChatNotificationSocketContext = createContext();
 
 export const ChatNotificationSocketProvider = ({ children, endpoint }) => {
   const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || "ws://localhost:8000";
+  const DEBUG_MODE = import.meta.env.VITE_APP_DEBUG === 'true';
   const { accessToken } = useAuthTokens();
   const [ws, setWs] = useState(null);
 
@@ -14,16 +15,16 @@ export const ChatNotificationSocketProvider = ({ children, endpoint }) => {
     const websocket = new WebSocket(`${WS_BASE_URL}${endpoint}?token=${accessToken}`);
 
     websocket.onopen = () => {
-      console.log("Chat WebSocket connected");
+      if (DEBUG_MODE) console.log("Chat WebSocket connected");
       setWs(websocket);
     };
 
     websocket.onerror = (error) => {
-      console.error("Chat WebSocket error:", error);
+      if (DEBUG_MODE) console.error("Chat WebSocket error:", error);
     };
 
     websocket.onclose = () => {
-      console.log("Chat WebSocket disconnected");
+      if (DEBUG_MODE) console.log("Chat WebSocket disconnected");
       setWs(null);
     };
 

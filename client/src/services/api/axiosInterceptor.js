@@ -3,6 +3,8 @@ import { store } from "../../global-state/app/store";
 import { updateAccess, logout } from "../../global-state/features/authSlice";
 import { getRefreshToken } from "./apiService";
 
+const DEBUG_MODE = import.meta.env.VITE_APP_DEBUG === 'true';
+
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
@@ -27,28 +29,28 @@ api.interceptors.response.use(
 
     // Handle network errors
     if (!error.response) {
-      console.error('Network error:', error.message);
+      if (DEBUG_MODE) console.error('Network error:', error.message);
       return Promise.reject(error);
     }
 
-    console.log('Error details:', error.response?.data, error.response?.status);
+    if (DEBUG_MODE) console.log('Error details:', error.response?.data, error.response?.status);
     // Check if the error is due to an expired token
     if (error.response?.status === 401 && !originalRequest._retry) {
-      console.log('Error: Refreshing token due to expired token');
+      if (DEBUG_MODE) console.log('Error: Refreshing token due to expired token');
       originalRequest._retry = true;
       const errorCode = error.response?.data?.code;
-      console.log('Error Code:', errorCode);
+      if (DEBUG_MODE) console.log('Error Code:', errorCode);
       
       if (errorCode === 'token_not_valid') {
         const { refreshToken } = store.getState().auth;
-        console.log('Using refresh token:', refreshToken);
+        if (DEBUG_MODE) console.log('Using refresh token:', refreshToken);
 
         if (refreshToken) {
           try {
             // Attempt to refresh the token
             const response = await getRefreshToken({refresh: refreshToken})
-            console.log('Current access token:', store.getState().auth.accessToken);
-            console.log('New access token:', response.data.access);
+            if (DEBUG_MODE) console.log('Current access token:', store.getState().auth.accessToken);
+            if (DEBUG_MODE) console.log('New access token:', response.data.access);
             
             // Update the access token
             store.dispatch(updateAccess({ access: response.data.access }));
@@ -58,19 +60,19 @@ api.interceptors.response.use(
             return api(originalRequest);
           } catch (refreshError) {
             // Handle error if token refresh fails
-            console.error('Token refresh failed:', refreshError);
+            if (DEBUG_MODE) console.error('Token refresh failed:', refreshError);
             store.dispatch(logout()); // clear tokens on failure
             return Promise.reject(refreshError);
           }
         }
       }
     }
-    console.log('outside')
-    if (error.status === 400 && error.response?.data?.error.toLowerCase().includes("invalid token")) {
-      console.log('inside')
-      console.warn("Invalid token detected, logging out user...");
-      store.dispatch(logout());
-    }
+    if (DEBUG_MODE) console.log('outside')
+    // if (error.status === 400 && error.response?.data?.error.toLowerCase().includes("invalid token")) {
+    //   if (DEBUG_MODE) console.log('inside')
+    //   if (DEBUG_MODE) console.warn("Invalid token detected, logging out user...");
+    //   store.dispatch(logout());
+    // }
 
     return Promise.reject(error);
   }

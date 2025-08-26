@@ -59,7 +59,7 @@ const Dashboard = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid md:grid-cols-3 gap-6 mt-16">
+        {/* <div className="grid md:grid-cols-3 gap-6 mt-16">
           <div className="card-primary text-center animate-fade-in">
             <div className="text-3xl font-bold text-accent-primary mb-2">3</div>
             <p className="text-text-secondary">Active Rooms</p>
@@ -72,7 +72,7 @@ const Dashboard = () => {
             <div className="text-3xl font-bold text-text-accent mb-2">5</div>
             <p className="text-text-secondary">Rooms Joined</p>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {showCreateModal && (

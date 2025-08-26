@@ -58,7 +58,7 @@ const MyRooms = () => {
   return (
     <div className="min-h-screen px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <BackButton />
+        <BackButton to={'/dashboard'} />
 
         <div className="space-y-4">
           {rooms.map((room, index) => (
@@ -75,7 +75,7 @@ const MyRooms = () => {
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
                         room.status === "active"
                           ? "bg-accent-primary/20 text-accent-primary"
-                          : "bg-text-muted/20 text-text-muted"
+                          : "bg-text-muted/20 text-text-muted border border-red-500"
                       }`}
                     >
                       {room.status}
@@ -96,8 +96,8 @@ const MyRooms = () => {
                     Settings
                   </ChatButton>
 
-                  <ChatButton onClick={() => handleJoinRoom(room.id)} variant="primary" className="text-sm px-4 py-2">
-                    Enter Room
+                  <ChatButton onClick={room.status === "active" ? () => handleJoinRoom(room.id) : null} disabled={room.status === "inactive"} variant="primary" className="text-sm px-4 py-2">
+                    {room.status === "active" ? "Enter Room" : "Room is Inactive"}
                   </ChatButton>
                 </div>
               </div>
