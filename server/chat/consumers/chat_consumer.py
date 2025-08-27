@@ -64,7 +64,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         #         },
         #     )
 
-
         elif message_type == "left_room":
             left = await participant_leave_room(self.user, room_id)
             print('left:', left)
@@ -92,6 +91,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         elif message_type == "send_chat":
             message = payload.get('message')
+            if not message.strip():
+                return
             msg_type = data.get('message_type', 'text')
             serialized_message = await save_message(self.user, room_id, message, msg_type)
             await self.channel_layer.group_send(
