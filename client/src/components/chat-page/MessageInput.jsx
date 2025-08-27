@@ -4,6 +4,7 @@ import ChatButton from "../ChatButton";
 import { useWebSocket } from "../../context/ChatNotificationSocketContext"
 import { handleError } from '../../utils/handleError';
 import { useAuthTokens } from "../../hooks/useAuthTokens"
+import { toast } from 'sonner';
 
 const MessageInput = ({ roomId, setMessages }) => {
   const [loading, setLoading] = useState(false);
@@ -26,6 +27,10 @@ const MessageInput = ({ roomId, setMessages }) => {
   }
 
   const handleSendMessage = async () => {
+    if (!message.trim()){
+      toast.error("type something")
+      return
+    }
     const tempMsg = createTempMsg()
     try {
       setLoading(true);
@@ -48,6 +53,7 @@ const MessageInput = ({ roomId, setMessages }) => {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      if (!message.trim()) return
       handleSendMessage();
     }
   };

@@ -1,6 +1,7 @@
 import logging
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 from .models import Room, Message
 from .serializers import MiniMessageSerializer
 
@@ -89,7 +90,14 @@ def remove_participant(owner, room_id, target_user_id):
 
 @database_sync_to_async
 def save_message(user, room_id, message, message_type):
-    room = Room.objects.get(id=room_id)
+    try:
+        room = Room.objects.get(id=room_id, status=Room.ACTIVE)
+    except Room.DoesNotExist:
+        raise PermissionDenied("Room does not exist or is inactive.")  # I have to improve, by giving proper return
+
+    if not room.participants.filter(id=user.id).exists():
+        raise PermissionDenied("You are not a participant of this room.")
+
     msg = Message(
         sender=user,
         room=room,

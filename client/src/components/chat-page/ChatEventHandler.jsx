@@ -5,7 +5,7 @@ import { useWebSocket } from "../../context/ChatNotificationSocketContext";
 import { toast } from "sonner";
 import { useAuthTokens } from "../../hooks/useAuthTokens"
   
-const ChatEventHandler = ({ roomId, setMessages, fetchMessages }) => {
+const ChatEventHandler = ({ roomId, setMessages, fetchRoomDetails, fetchMessages }) => {
   const DEBUG_MODE = import.meta.env.VITE_APP_DEBUG === 'true';
   const { wsSend, wsListen } = useWebSocket();
   const { userId, username } = useAuthTokens()
@@ -53,6 +53,7 @@ const ChatEventHandler = ({ roomId, setMessages, fetchMessages }) => {
         const subType = data.sub_type;
         const senderId = data.payload?.sender_id
         if (subType === 'joined' && senderId == userId) {
+          fetchRoomDetails()
           fetchMessages()
           return
         } else if (subType === 'left' && senderId == userId) {

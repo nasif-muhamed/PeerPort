@@ -3,8 +3,11 @@ import { IoIosFlash, IoIosLock, IoIosGlobe } from "react-icons/io";
 import ChatButton from "../components/ChatButton";
 import ChatBubble from "../components/ChatBubble";
 import Card from '../components/CardLanding'
+import { useAuthTokens } from '../hooks/useAuthTokens'
 
 const Landing = () => {
+  const { username } = useAuthTokens()
+
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-4 py-8">
       <div className="max-w-4xl w-full mx-auto text-center">
@@ -61,16 +64,16 @@ const Landing = () => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up">
-          <Link to="/register">
+          <Link to={username ? "/dashboard" : "/register"}>
             <ChatButton variant="primary" className="w-full sm:w-auto">
-              Get Started
+              {username ? "Go to Dashboard" : "Get Started"}
             </ChatButton>
           </Link>
-          <Link to="/login">
+          {!username && <Link to={"/login"}>
             <ChatButton variant="secondary" className="w-full sm:w-auto">
               Already have an account?
             </ChatButton>
-          </Link>
+          </Link>}
         </div>
       </div>
     </div>
