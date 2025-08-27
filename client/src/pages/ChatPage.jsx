@@ -34,10 +34,6 @@ const ChatPage = () => {
     }
   }
 
-  useEffect(() => {
-    fetchRoomDetails()
-  }, [])
-
   const fetchMessages = async () => {
     try {
       const { data } = await getMessages(roomId);
@@ -83,6 +79,7 @@ const ChatPage = () => {
       <ChatEventHandler 
         roomId={roomId}
         setMessages={setMessages}
+        fetchRoomDetails={fetchRoomDetails}
         fetchMessages={fetchMessages}
       />
       {loading && <ChatLoader/>}
