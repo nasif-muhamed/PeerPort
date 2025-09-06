@@ -1,9 +1,24 @@
 import api from "./axiosInstance";
-import { store } from "../../global-state/app/store"; 
+import { store } from "../../global-state/app/store";
 import { updateAccess, logout } from "../../global-state/features/authSlice";
 import { getRefreshToken } from "./apiService";
 
 const DEBUG_MODE = import.meta.env.VITE_APP_DEBUG === 'true';
+
+// Global flag to prevent concurrent refresh attempts
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (token) {
+      prom.resolve(token);
+    } else {
+      prom.reject(error);
+    }
+  });
+  failedQueue = [];
+};
 
 // Request interceptor
 api.interceptors.request.use(
@@ -14,66 +29,85 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Response interceptor
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle network errors
     if (!error.response) {
       if (DEBUG_MODE) console.error('Network error:', error.message);
       return Promise.reject(error);
     }
 
     if (DEBUG_MODE) console.log('Error details:', error.response?.data, error.response?.status);
-    // Check if the error is due to an expired token
+
     if (error.response?.status === 401 && !originalRequest._retry) {
-      if (DEBUG_MODE) console.log('Error: Refreshing token due to expired token');
+      if (DEBUG_MODE) console.log('Error: Attempting to refresh token');
       originalRequest._retry = true;
+
       const errorCode = error.response?.data?.code;
       if (DEBUG_MODE) console.log('Error Code:', errorCode);
-      
+
       if (errorCode === 'token_not_valid') {
         const { refreshToken } = store.getState().auth;
         if (DEBUG_MODE) console.log('Using refresh token:', refreshToken);
 
         if (refreshToken) {
-          try {
-            // Attempt to refresh the token
-            const response = await getRefreshToken({refresh: refreshToken})
-            if (DEBUG_MODE) console.log('Current access token:', store.getState().auth.accessToken);
-            if (DEBUG_MODE) console.log('New access token:', response.data.access);
-            
-            // Update the access token
-            store.dispatch(updateAccess({ access: response.data.access }));
+          if (isRefreshing) {
+            return new Promise((resolve, reject) => {
+              failedQueue.push({ resolve, reject });
+            })
+              .then((token) => {
+                originalRequest.headers.Authorization = `Bearer ${token}`;
+                return api(originalRequest);
+              })
+              .catch((err) => Promise.reject(err));
+          }
 
-            // Retry the original request with the new token
-            originalRequest.headers.Authorization = `Bearer ${response.data.access}`;
+          isRefreshing = true;
+
+          try {
+            const response = await getRefreshToken({ refresh: refreshToken });
+            const newAccessToken = response.data.access;
+            if (DEBUG_MODE) console.log('New access token:', newAccessToken);
+
+            store.dispatch(updateAccess({ access: newAccessToken }));
+            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+            processQueue(null, newAccessToken);
+            isRefreshing = false;
+
             return api(originalRequest);
           } catch (refreshError) {
-            // Handle error if token refresh fails
             if (DEBUG_MODE) console.error('Token refresh failed:', refreshError);
-            store.dispatch(logout()); // clear tokens on failure
+
+            if (refreshError.response?.status === 401 || !refreshToken) {
+              if (DEBUG_MODE) console.log('Refresh token invalid or expired, logging out');
+              store.dispatch(logout()); // Clear tokens from Redux
+              processQueue(refreshError);
+              isRefreshing = false;
+              // Force redirect to login
+              window.location.href = '/login';
+              return Promise.reject(refreshError);
+            }
+
+            processQueue(refreshError);
+            isRefreshing = false;
             return Promise.reject(refreshError);
           }
+        } else {
+          if (DEBUG_MODE) console.log('No refresh token available, logging out');
+          store.dispatch(logout());
+          window.location.href = '/login';
+          return Promise.reject(error);
         }
       }
     }
-    if (DEBUG_MODE) console.log('outside')
-    // if (error.status === 400 && error.response?.data?.error.toLowerCase().includes("invalid token")) {
-    //   if (DEBUG_MODE) console.log('inside')
-    //   if (DEBUG_MODE) console.warn("Invalid token detected, logging out user...");
-    //   store.dispatch(logout());
-    // }
 
+    if (DEBUG_MODE) console.log('Non-401 error or retry exhausted');
     return Promise.reject(error);
   }
 );
