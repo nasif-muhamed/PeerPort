@@ -36,7 +36,6 @@ const MessageInput = ({ roomId, setMessages }) => {
       setLoading(true);
       wsSend({
         type: 'send_chat',
-        room_id: roomId,
         payload: {
           message: message,
         }

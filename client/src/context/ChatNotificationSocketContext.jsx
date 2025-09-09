@@ -23,8 +23,8 @@ export const ChatNotificationSocketProvider = ({ children, endpoint }) => {
       if (DEBUG_MODE) console.error("Chat WebSocket error:", error);
     };
 
-    websocket.onclose = () => {
-      if (DEBUG_MODE) console.log("Chat WebSocket disconnected");
+    websocket.onclose = (event) => {
+      if (DEBUG_MODE) console.log("Chat WebSocket disconnected", event);
       setWs(null);
     };
 
@@ -53,7 +53,7 @@ export const ChatNotificationSocketProvider = ({ children, endpoint }) => {
   );
 
   return (
-    <ChatNotificationSocketContext.Provider value={{ wsSend, wsListen }}>
+    <ChatNotificationSocketContext.Provider value={{ ws, wsSend, wsListen }}>
       {children}
     </ChatNotificationSocketContext.Provider>
   );

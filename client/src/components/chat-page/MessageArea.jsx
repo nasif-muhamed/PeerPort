@@ -72,7 +72,7 @@ const MessageArea = ({ messages, chatLoading, loadingOlderMessages, onLoadMore, 
       )}
 
       {/* Messages */}
-      {messages.map((msg, idx) => (
+      {messages.map((msg) => (
         <div key={msg.id} className="animate-chat-appear">
           {msg.msg_type === 'system' ? (
             <div className="text-center">
