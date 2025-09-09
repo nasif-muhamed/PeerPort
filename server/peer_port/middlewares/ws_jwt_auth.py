@@ -1,4 +1,3 @@
-# middleware/jwt_auth.py
 import logging
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
@@ -31,31 +30,18 @@ class JWTAuthMiddleware(BaseMiddleware):
                 validated_token = AccessToken(token)
                 user = await get_user(validated_token["user_id"])
                 scope['user'] = user
+
             except InvalidToken as e:
                 scope['user'] = AnonymousUser()
-                await send({
-                    'type': 'websocket.close',
-                    'code': 4001,
-                    'reason': 'token_not_valid'
-                })
-                return
+                logger.error(f"Invalid Token: {e}")
+                
             except TokenError as e:
                 scope['user'] = AnonymousUser()
                 logger.error(f"Token error: {e}")
-                await send({
-                    'type': 'websocket.close',
-                    'code': 4001,
-                    'reason': 'token_not_valid'
-                })
-                return
+                
         else:
             scope['user'] = AnonymousUser()
             logger.warning("WebSocket connection attempt without token")
-            await send({
-                'type': 'websocket.close',
-                'code': 4001,
-                'reason': 'token_missing'
-            })
-            return
+
         return await super().__call__(scope, receive, send)
     

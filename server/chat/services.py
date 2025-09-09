@@ -15,7 +15,7 @@ def permission_to_join_room(user, room_id):
     logger.debug(user, room_id)
     try:
         room = Room.objects.get(id=room_id, status=Room.ACTIVE)
-        print('join room count:', room.participants.count())
+        logger.info(f'join room count: {room.participants.count()}')
         if room.participants.filter(id=user.id).exists():
             return True, False
         if room.limit <= room.participants.count():
@@ -23,7 +23,7 @@ def permission_to_join_room(user, room_id):
         if room.access == Room.PUBLIC:
             room.participants.add(user)
             room.save(update_fields=[])
-            print('join inside room count:', room.participants.count())
+            logger.info(f'join inside room count: {room.participants.count()}')
             return True, True
         else:
             return False, False
@@ -42,15 +42,11 @@ def participant_leave_room(user, room_id):
     try:
         room = Room.objects.get(id=room_id, status=Room.ACTIVE)
         logger.debug('room:', room)
-        print('leave count:', room.participants.count())
-        print(room.owner == user)
         if room.owner == user:
             return False
         if room.participants.filter(id=user.id).exists():
-            print('inside')
             room.participants.remove(user)
             room.save(update_fields=[])
-            print('count:', room.participants.count())
             return True
         return False
 
