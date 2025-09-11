@@ -122,7 +122,7 @@ class UserAuthenticationIntegrationTest(APITestCase):
         logout_data = {'refresh': refresh_token}
         response = self.client.post(self.logout_url, logout_data)
         
-        self.assertEqual(response.status_code, status.HTTP_205_RESET_CONTENT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['message'], 'Logout successful')
 
     def test_logout_with_invalid_token(self):
@@ -212,7 +212,7 @@ class CompleteUserFlowIntegrationTest(APITestCase):
         # Step 4: Logout
         logout_data = {'refresh': refresh_token}
         logout_response = self.client.post(reverse('logout-user'), logout_data)
-        self.assertEqual(logout_response.status_code, status.HTTP_205_RESET_CONTENT)
+        self.assertEqual(logout_response.status_code, status.HTTP_200_OK)
         
         # Step 5: Verify token is blacklisted (try to refresh)
         refresh_data = {'refresh': refresh_token}

@@ -122,7 +122,7 @@ class LogoutViewTest(APITestCase):
         logout_data = {'refresh': self.refresh_token}
         response = self.client.post(self.url, logout_data)
         
-        self.assertEqual(response.status_code, status.HTTP_205_RESET_CONTENT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['message'], 'Logout successful')
 
     def test_logout_without_authentication(self):

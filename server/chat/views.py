@@ -108,6 +108,6 @@ class RoomMessageListView(ListAPIView):
     
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
-        # reversing the list for the UI purpose: oldest → newest
+        # reversing the list for the UI purpose: oldest - newest
         response.data["results"].reverse()
         return response

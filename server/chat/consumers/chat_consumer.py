@@ -42,25 +42,32 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         if not self.user.is_anonymous:
-            await participant_leave_room(self.user, self.room_id)
-            await self.channel_layer.group_discard(
-                self.room_name,
-                self.channel_name
-            )
-            await self.channel_layer.group_send(
-                self.room_name,
-                {
-                    "type": "group_notification",
-                    "room_id": self.room_id,
-                    "sub_type": 'left',
-                    "payload": {
-                        "message": f"{self.user.username} left the room",
-                        "sender": "system",
-                        "sender_id": self.user.id,
+            try:
+                await participant_leave_room(self.user, self.room_id)
+                await self.channel_layer.group_discard(
+                    self.room_name,
+                    self.channel_name
+                )
+                await self.channel_layer.group_send(
+                    self.room_name,
+                    {
+                        "type": "group_notification",
+                        "room_id": self.room_id,
+                        "sub_type": 'left',
+                        "payload": {
+                            "message": f"{self.user.username} left the room",
+                            "sender": "system",
+                            "sender_id": self.user.id,
+                        },
                     },
-                },
-            )
-
+                )
+            except Exception as e:
+                logger.error(f"Error in disconnect: {e}", exc_info=True)
+                # Continue with group discard and notification even if participant_leave_room fails
+                await self.channel_layer.group_discard(
+                    self.room_name,
+                    self.channel_name
+                )
             
     async def receive(self, text_data):
         data = json.loads(text_data)
