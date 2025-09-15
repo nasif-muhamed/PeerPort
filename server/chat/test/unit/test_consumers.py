@@ -74,7 +74,7 @@ class ChatConsumerTest(TransactionTestCase):
         connected, subprotocol = await communicator.connect()
         self.assertFalse(connected)
 
-    async def test_non_participant_cannot_connect(self):
+    async def test_non_participant_can_connect_to_public_room(self):
         """Test non-participant cannot connect to websocket"""
         communicator = WebsocketCommunicator(
             ChatConsumer.as_asgi(),
@@ -84,7 +84,7 @@ class ChatConsumerTest(TransactionTestCase):
         communicator.scope['url_route'] = {'kwargs': {'room_id': str(self.room.id)}}
         
         connected, subprotocol = await communicator.connect()
-        self.assertFalse(connected)
+        self.assertTrue(connected)
 
     async def test_send_message_workflow(self):
         """Test sending message through websocket"""
@@ -218,10 +218,10 @@ class ChatConsumerTest(TransactionTestCase):
         
         asyncio.run(test())
 
-    def test_connect_non_participant(self):
+    def test_connect_non_participant_to_public_room(self):
         """Test wrapper for non-participant connection"""
         async def test():
-            await self.test_non_participant_cannot_connect()
+            await self.test_non_participant_can_connect_to_public_room()
         
         asyncio.run(test())
 

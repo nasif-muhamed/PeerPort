@@ -8,3 +8,4 @@ media
 venv/
 .env
 logs
+.pytest_cache/
