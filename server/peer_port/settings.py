@@ -222,3 +222,26 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer",
     },
 }
+
+
+# Open API setup
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'PeerPort API',
+    'DESCRIPTION': 'PeerPort API documentation',
+    'VERSION': '1.0.0',
+    'TOS': 'https://www.example.com/terms/',
+    'CONTACT': {
+        'name': 'API Support',
+        'email': 'support@example.com',
+    },
+    'LICENSE': {
+        'name': 'MIT License',
+    },
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SORT_OPERATIONS': True,  # sorts operations within a tag
+
+    'TAGS': [
+        {'name': 'users', 'description': 'User related operations'},
+        {'name': 'chats', 'description': 'Chat related operations'},
+    ],
+}

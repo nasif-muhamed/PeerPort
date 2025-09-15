@@ -10,12 +10,19 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Room, Message
 from .serializers import RoomOwnerSerializer, RoomOwnerDetailSerializer, PublicRoomSerializer, MessageSerializer
 from peer_port.pagination import CommonPagination
+from .view_methods import (
+    OwnerRoomMethodsMixin,
+    OwnerSingleRoomMethodsMixin,
+    PublicAllRoomMethodsMixin,
+    PublicRoomDetailMethodsMixin,
+    RoomMessageMethodsMixin
+)
 
 
 logger = logging.getLogger(__name__)
 
 
-class OwnerRoomListCreateAPIView(ListCreateAPIView):
+class OwnerRoomListCreateAPIView(OwnerRoomMethodsMixin, ListCreateAPIView):
     serializer_class = RoomOwnerSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = CommonPagination
@@ -30,7 +37,7 @@ class OwnerRoomListCreateAPIView(ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
 
-class OwnerSingleRoomAPIView(RetrieveUpdateDestroyAPIView):
+class OwnerSingleRoomAPIView(OwnerSingleRoomMethodsMixin, RetrieveUpdateDestroyAPIView):
     serializer_class = RoomOwnerDetailSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'id'
@@ -42,7 +49,7 @@ class OwnerSingleRoomAPIView(RetrieveUpdateDestroyAPIView):
         )
 
 
-class PublicAllRoomListView(ListAPIView):
+class PublicAllRoomListView(PublicAllRoomMethodsMixin, ListAPIView):
     serializer_class = PublicRoomSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = CommonPagination
@@ -66,7 +73,7 @@ class PublicAllRoomListView(ListAPIView):
         return queryset.order_by("-created_at")
 
 
-class PublicRoomDetailView(RetrieveAPIView):
+class PublicRoomDetailView(PublicRoomDetailMethodsMixin, RetrieveAPIView):
     serializer_class = PublicRoomSerializer
     permission_classes = [IsAuthenticated]
 
@@ -76,7 +83,7 @@ class PublicRoomDetailView(RetrieveAPIView):
         )
 
 
-class RoomMessageListView(ListAPIView):
+class RoomMessageListView(RoomMessageMethodsMixin, ListAPIView):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = CommonPagination

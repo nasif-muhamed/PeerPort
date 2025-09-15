@@ -35,7 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
     
 
-# using in: RoomOwnerDetailSerializer, PublicRoomSerializer
+# using in chat app: RoomOwnerDetailSerializer, PublicRoomSerializer
 class MiniUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

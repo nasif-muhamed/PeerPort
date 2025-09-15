@@ -7,11 +7,12 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer, CustomTokenObtainPairSerializer
-
+from .spectacular_schemas import doc_login_schema, doc_register_schema, doc_profile_schema, doc_logout_schema
 
 logger = logging.getLogger(__name__)
 
 
+@doc_login_schema()
 class LoginView(TokenObtainPairView):
     permission_classes = [AllowAny]
     serializer_class = CustomTokenObtainPairSerializer
@@ -20,6 +21,7 @@ class LoginView(TokenObtainPairView):
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
+    @doc_register_schema()
     def post(self, request):
         logger.debug(f'inside post RegisterView {request.data}')
         serializer = UserSerializer(data=request.data)
@@ -29,6 +31,7 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@doc_profile_schema()
 class UserProfileView(RetrieveAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
@@ -40,6 +43,7 @@ class UserProfileView(RetrieveAPIView):
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @doc_logout_schema()
     def post(self, request):
         try:
             refresh_token = request.data["refresh"]
