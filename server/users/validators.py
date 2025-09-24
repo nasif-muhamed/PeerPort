@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 
 User = get_user_model()
-USERNAME_PATTERN = r'^[a-z_]+$'
+USERNAME_PATTERN = r'^[a-z0-9_]+$'
 PASSWORD_SPECIAL_CHARS = r'[!@#$%^&*(),.?":{}|<>]'
 UPPER_CASE = r'[A-Z]'
 LOWER_CASE = r'[a-z]'
@@ -20,7 +20,7 @@ def validate_username(value):
     if sum(c.isalpha() for c in value) < 3:
         raise ValidationError("Username must contain at least three letters.")
     if not re.match(USERNAME_PATTERN, value):
-        raise ValidationError("Username must only contain lowercase letters and underscores.")
+        raise ValidationError("Username must only contain lowercase letters, numbers and underscores.")
     if User.objects.filter(username__iexact=value).exists():
         raise ValidationError("This username is already taken.")
     return value
