@@ -181,6 +181,7 @@ const RoomSettings = () => {
                 <ChatButton
                   variant="secondary"
                   onClick={handleTogglePrivacy}
+                  disabled
                 >
                   Make {room.access === "private" ? "Public" : "Private"}
                 </ChatButton>
